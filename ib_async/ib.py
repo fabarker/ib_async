@@ -327,7 +327,7 @@ class IB:
     def connect(
         self,
         host: str = "127.0.0.1",
-        port: int = 7497,
+        port: int = 4001,
         clientId: int = 1,
         timeout: float = 4,
         readonly: bool = False,
@@ -2004,7 +2004,7 @@ class IB:
     async def connectAsync(
         self,
         host: str = "127.0.0.1",
-        port: int = 7497,
+        port: int = 4001,
         clientId: int = 1,
         timeout: Optional[float] = 4,
         readonly: bool = False,
@@ -2562,5 +2562,5 @@ if __name__ == "__main__":
     loop.set_debug(True)
     util.logToConsole(logging.DEBUG)
     ib = IB()
-    ib.connect("127.0.0.1", 7497, clientId=1)
+    ib.connect("127.0.0.1", 4001, clientId=1)
     ib.disconnect()

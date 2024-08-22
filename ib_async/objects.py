@@ -5,6 +5,9 @@ from datetime import date as date_, datetime
 from typing import List, NamedTuple, Optional, Union
 
 from eventkit import Event
+import pandas as pd
+import numpy as np
+from dateutil.parser import parse
 
 from .contract import Contract, ScanData, TagValue
 from .util import EPOCH, UNSET_DOUBLE, UNSET_INTEGER

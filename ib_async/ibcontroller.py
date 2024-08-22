@@ -259,7 +259,7 @@ class Watchdog:
     controller: IBC
     ib: IB
     host: str = "127.0.0.1"
-    port: int = 7497
+    port: int = 4001
     clientId: int = 1
     connectTimeout: float = 2
     appStartupTime: float = 30
