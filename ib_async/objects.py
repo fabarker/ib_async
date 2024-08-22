@@ -481,6 +481,82 @@ class DynamicObject:
         return f"{clsName}({kwargs})"
 
 
+class TradeRecord:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def __repr__(self):
+        clsName = self.__class__.__name__
+        kwargs = ', '.join(f'{k}={v!r}' for k, v in self.__dict__.items())
+        return f'{clsName}({kwargs})'
+
+
+class TradeLibrary:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(TradeLibrary, cls).__new__(cls)
+            cls._instance._records = {}
+        return cls._instance
+
+    def add_record_from_dict(self, record_dict):
+        self.add_record(TradeRecord(**record_dict))
+
+    def add_record(self, record):
+        if isinstance(record, TradeRecord):
+            self._records[record.tradeID] = record  # Store the TradeRecord instance
+        else:
+            raise TypeError("Only TradeRecord instances can be added.")
+
+    def getRecord(self, tradeID):
+        return self._records.get(tradeID, None)
+
+    def __repr__(self):
+        return f"TradeLibrary({len(self._records)} trades)"
+
+    @property
+    def trades(self):
+        return list(self._records.values())
+
+    @property
+    def ids(self):
+        return list(self._records.keys())
+
+    @property
+    def conId(self):
+        return np.asarray([x.conid for x in self.trades])
+
+    @property
+    def datetimes(self):
+        return [parse(x.dateTime) if ';' in str(x.dateTime)
+                else parse(str(x.dateTime) + ';000000') for x in self.trades]
+
+    def filter(self, **kwargs):
+        return [
+            x for x in self.trades
+            if all(
+                x.__dict__.get(key) in value if isinstance(value, list) else x.__dict__.get(key) == value
+                for key, value in kwargs.items()
+            )
+        ]
+
+    def filterDF(self, **kwargs):
+        return pd.DataFrame.from_records([x.__dict__ for x in self.filter(**kwargs)]).set_index('tradeID', drop=True)
+
+    @staticmethod
+    def create(df: pd.DataFrame):
+
+        # instantiate lib
+        lib = TradeLibrary()
+
+        # convert the dataframe to list of dicts
+        list_of_dicts = df.to_dict(orient='records')
+        for r in list_of_dicts:
+            lib.add_record_from_dict(r)
+        return lib
+
+
 class FundamentalRatios(DynamicObject):
     """
     See:
